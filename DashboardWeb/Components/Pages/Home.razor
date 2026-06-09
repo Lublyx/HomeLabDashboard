@@ -11,26 +11,35 @@
 
 <h1>Informations</h1>
 
-<ArcadiaGaugeChart Value="@_cpuUsage" Min="0" Max="100" Label="CPU Usage" Width="200" Height="160" />
+<ArcadiaGaugeChart Value="@_cpuUsage" Min="0" Max="100" Title="CPU Usage %" Width="200" Height="160" Color="#A1FFA1" StrokeWidth="15"/>
+
+<ArcadiaGaugeChart Value="@_ramUsage" Min="0" Max="@_hardwareInfoService.GetRamCapacity()" Title="RAM Usage Go" Width="200" Height="160" Color="#A1F2FF" StrokeWidth="15"/>
+
+<ArcadiaGaugeChart Value="@_diskUsage" Min="0" Max="@_hardwareInfoService.GetDiskCapacity()" Title="Disk Usage Go" Width="200" Height="160" Color="#D300FF" StrokeWidth="15"/>
 
 @code {
     private HardwareInfoService _hardwareInfoService = new HardwareInfoService();
     private int _cpuUsage = 0;
+    private int _ramUsage = 0;
+    private int _diskUsage = 0;
 }
 
 @functions {
-    private Timer _timer = new Timer() { Interval = 3000, AutoReset = true, Enabled = true };
+    private Timer _timer = new Timer() { Interval = 1000, AutoReset = true, Enabled = true };
     protected override void OnInitialized()
     {
-        _timer.Elapsed += GetCpuUsage;
+        _timer.Elapsed += GetHardwareInfo;
 
     }
 
-    public void GetCpuUsage(object? sender, ElapsedEventArgs e)
+    public void GetHardwareInfo(object? sender, ElapsedEventArgs e)
     {
         _ = InvokeAsync(() =>
         {
             _cpuUsage = _hardwareInfoService.GetCpuUsage();
+            _ramUsage = _hardwareInfoService.GetRamUsage();
+
+            Console.WriteLine(_ramUsage);
             StateHasChanged();
         });
 

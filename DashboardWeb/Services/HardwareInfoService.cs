@@ -8,12 +8,12 @@ namespace DashboardWeb.Services
 {
     public class HardwareInfoService
     {
-        IHardwareInfo hardwareInfo = new HardwareInfo();
+        private IHardwareInfo _hardwareInfo = new HardwareInfo();
 
         public int GetCpuUsage()
         {
-            hardwareInfo.RefreshCPUList();
-            CPU cpu =  hardwareInfo.CpuList.First();
+            _hardwareInfo.RefreshCPUList();
+            CPU cpu =  _hardwareInfo.CpuList.First();
 
             IList<CpuCore> cores = cpu.CpuCoreList;
 
@@ -25,6 +25,38 @@ namespace DashboardWeb.Services
             }
 
             return (int)(currentClock / (ulong)cores.Count);
+        }
+
+        public int GetRamUsage()
+        {
+            _hardwareInfo.RefreshMemoryStatus();
+            return (int)((_hardwareInfo.MemoryStatus.TotalPhysical-_hardwareInfo.MemoryStatus.AvailablePhysical)/1000000000);
+        }
+
+        public ulong GetRamCapacity()
+        {
+            _hardwareInfo.RefreshMemoryStatus();
+            return _hardwareInfo.MemoryStatus.TotalPhysical/1000000000;
+        }
+
+        public ulong GetDiskCapacity()
+        {
+            _hardwareInfo.RefreshDriveList();
+
+            IList<Drive> drives = _hardwareInfo.DriveList;
+            Console.WriteLine(_hardwareInfo.DriveList.Count);
+
+            // foreach (Drive drive in drives)
+            // {
+                
+            //     Console.WriteLine(drive.Name);
+            //     // return drive.PartitionList.First(d => d.PrimaryPartition).Size;   
+            //     foreach (Partition partition in drive.PartitionList)
+            //     {
+            //         Console.WriteLine(partition.Name);
+            //     }
+            // }
+            return 0;
         }
     }
 }
