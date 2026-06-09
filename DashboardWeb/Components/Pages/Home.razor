@@ -1,7 +1,46 @@
 ﻿@page "/"
+@using Services
+@using System.Timers
+@implements IDisposable
+@rendermode InteractiveServer
+@using Arcadia.Charts.Components.Charts
 
-<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+<PageTitle>Informations</PageTitle>
+
+<h1>Informations</h1>
+
+<ArcadiaGaugeChart Value="@_cpuUsage" Min="0" Max="100" Label="CPU Usage" Width="200" Height="160" />
+
+@code {
+    private HardwareInfoService _hardwareInfoService = new HardwareInfoService();
+    private int _cpuUsage = 0;
+}
+
+@functions {
+    private Timer _timer = new Timer() { Interval = 3000, AutoReset = true, Enabled = true };
+    protected override void OnInitialized()
+    {
+        _timer.Elapsed += GetCpuUsage;
+
+    }
+
+    public void GetCpuUsage(object? sender, ElapsedEventArgs e)
+    {
+        _ = InvokeAsync(() =>
+        {
+            _cpuUsage = _hardwareInfoService.GetCpuUsage();
+            StateHasChanged();
+        });
+
+    }
+
+    public void Dispose()
+    {
+        _timer.Dispose();
+    }
+
+}
+
+

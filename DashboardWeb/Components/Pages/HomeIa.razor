@@ -1,0 +1,43 @@
+﻿@page "/ia"
+@rendermode InteractiveServer
+@using System.Diagnostics
+
+<PageTitle>Home IA</PageTitle>
+
+<h1>Home IA</h1>
+
+<h3 role="status">Models à charger</h3>
+
+@foreach(string model in GetModels()){
+    <button @onclick="e => LoadModel(model)">@model</button>
+}
+
+<button @onclick="UnLoadModel">Ejecter</button>
+
+
+@code {
+    private Process process = new Process();
+    private IList<string> models = new List<string>();
+    
+    public IList<string> GetModels()
+    {
+        return Directory.GetFiles("/home/lucas/.llamacpp/");
+    }
+
+    public void LoadModel(string path){
+        ProcessStartInfo processStartInfo = new ProcessStartInfo{
+            FileName = "/bin/bash",
+            UseShellExecute = false,
+            Arguments = path,
+            RedirectStandardOutput = false,
+        };
+
+        process.StartInfo = processStartInfo;
+        process.Start();
+    }
+
+    public void UnLoadModel(){
+        process.Close();
+    }
+
+}
