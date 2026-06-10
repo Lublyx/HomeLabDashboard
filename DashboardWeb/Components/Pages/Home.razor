@@ -1,9 +1,9 @@
 ﻿@page "/"
-@using Services
 @using System.Timers
 @implements IDisposable
 @rendermode InteractiveServer
 @using Arcadia.Charts.Components.Charts
+@using Classes
 
 
 
@@ -11,38 +11,40 @@
 
 <h1>Informations</h1>
 
-<ArcadiaGaugeChart Value="@_cpuUsage" Min="0" Max="100" Title="CPU Usage %" Width="200" Height="160" Color="#A1FFA1" StrokeWidth="15"/>
-
-<ArcadiaGaugeChart Value="@_ramUsage" Min="0" Max="@_hardwareInfoService.GetRamCapacity()" Title="RAM Usage Go" Width="200" Height="160" Color="#A1F2FF" StrokeWidth="15"/>
-
-<ArcadiaGaugeChart Value="@_diskUsage" Min="0" Max="@_hardwareInfoService.GetDiskCapacity()" Title="Disk Usage Go" Width="200" Height="160" Color="#D300FF" StrokeWidth="15"/>
-
-@code {
-    private HardwareInfoService _hardwareInfoService = new HardwareInfoService();
-    private int _cpuUsage = 0;
-    private int _ramUsage = 0;
-    private int _diskUsage = 0;
+@foreach (IHardwareUsage hardware in _hardwaresUsage)
+{
+    <ArcadiaGaugeChart Value="@hardware.CurrentUsage" Min="0" Max="@hardware.GetMaxUsage()" Title="@hardware.Title" Width="200" Height="160" Color="@hardware.Color"
+                       StrokeWidth="15" />
 }
 
-@functions {
+@code {
     private Timer _timer = new Timer() { Interval = 1000, AutoReset = true, Enabled = true };
+    private IList<IHardwareUsage> _hardwaresUsage = new List<IHardwareUsage>();
+
     protected override void OnInitialized()
     {
-        _timer.Elapsed += GetHardwareInfo;
+        BuildParams(new CpuUsage() { Title = "CPU Usage %", Color = "#D60000" });
+        BuildParams(new RamUsage() { Title = "RAM Usage Go", Color = "#A1F2FF" });
+        BuildParams(new DiskUsage() { Title = "Disk Usage Go", Color = "#D300FF" });
+        BuildParams(new BatteryStatus() { Title = "Battery %", Color = "#56FF12" });
 
+        _timer.Elapsed += GetHardwareInfo;
+    }
+
+    private void BuildParams(IHardwareUsage hardware)
+    {
+        _hardwaresUsage.Add(hardware);
     }
 
     public void GetHardwareInfo(object? sender, ElapsedEventArgs e)
     {
         _ = InvokeAsync(() =>
         {
-            _cpuUsage = _hardwareInfoService.GetCpuUsage();
-            _ramUsage = _hardwareInfoService.GetRamUsage();
-
-            Console.WriteLine(_ramUsage);
+            foreach(IHardwareUsage hardware in _hardwaresUsage){
+                hardware.GetCurrentUsage();
+            }
             StateHasChanged();
         });
-
     }
 
     public void Dispose()
