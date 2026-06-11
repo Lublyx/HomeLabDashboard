@@ -1,0 +1,13 @@
+
+.title{
+    text-align: center;
+    font-size: 40px;
+    padding-top: 20px;
+    padding-bottom: 40px;
+}
+
+.system-info{
+    display: flex;
+    gap: 100px;
+    justify-content: center;
+}

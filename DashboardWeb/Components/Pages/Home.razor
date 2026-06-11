@@ -6,16 +6,21 @@
 @using Classes
 
 
+<div>
 
 <PageTitle>Informations</PageTitle>
 
-<h1>Informations</h1>
+<h1 class="title">Informations</h1>
+
+<section class="system-info">
 
 @foreach (IHardwareUsage hardware in _hardwaresUsage)
 {
     <ArcadiaGaugeChart Value="@hardware.CurrentUsage" Min="0" Max="@hardware.GetMaxUsage()" Title="@hardware.Title" Width="200" Height="160" Color="@hardware.Color"
                        StrokeWidth="15" />
 }
+</section>
+</div>
 
 @code {
     private Timer _timer = new Timer() { Interval = 1000, AutoReset = true, Enabled = true };

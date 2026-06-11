@@ -1,43 +1,44 @@
 ﻿@page "/ia"
 @rendermode InteractiveServer
 @using System.Diagnostics
+@using Classes
+@using Services
 
 <PageTitle>Home IA</PageTitle>
 
-<h1>Home IA</h1>
+<h1 class="title">Home IA</h1>
 
-<h3 role="status">Models à charger</h3>
+<h3 class="load-model">Models à charger</h3>
 
-@foreach(string model in GetModels()){
-    <button @onclick="e => LoadModel(model)">@model</button>
-}
+<div class="button-container">
+    @foreach (string model in GetModels())
+    {
+        <button class="btn-style" @onclick="e => LoadModel(model)">@model</button>
+    }
 
-<button @onclick="UnLoadModel">Ejecter</button>
-
+    <button class="btn-style btn-eject" @onclick="UnLoadModel">Ejecter</button>
+</div>
 
 @code {
-    private Process process = new Process();
+    private UnLoadModelService unLoadModelService = new UnLoadModelService();
     private IList<string> models = new List<string>();
-    
+    private static string selectedModel = "";
+
     public IList<string> GetModels()
     {
         return Directory.GetFiles("/home/lucas/.llamacpp/scripts/");
     }
 
-    public void LoadModel(string path){
-        ProcessStartInfo processStartInfo = new ProcessStartInfo{
-            FileName = "/bin/bash",
-            UseShellExecute = false,
-            Arguments = path,
-            RedirectStandardOutput = false,
-        };
-
-        process.StartInfo = processStartInfo;
-        process.Start();
+    public void LoadModel(string path)
+    {
+        selectedModel = path;
+        ProcessRunner.Run("/bin/bash", path);
     }
 
-    public void UnLoadModel(){
-        process.Close();
+    public void UnLoadModel()
+    {
+        if (!string.IsNullOrEmpty(selectedModel))
+            unLoadModelService.UnLoad(selectedModel);
     }
 
 }
