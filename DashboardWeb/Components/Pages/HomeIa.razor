@@ -11,34 +11,36 @@
 <h3 class="load-model">Models à charger</h3>
 
 <div class="button-container">
-    @foreach (string model in GetModels())
+    @foreach (Model model in _loadModelService.LoadAvailableModels())
     {
-        <button class="btn-style" @onclick="e => LoadModel(model)">@model</button>
+        <button class="btn-style" @onclick="e => LoadModel(model.ModelPath)">@model.ModelName</button>
     }
 
     <button class="btn-style btn-eject" @onclick="UnLoadModel">Ejecter</button>
 </div>
 
 @code {
-    private UnLoadModelService unLoadModelService = new UnLoadModelService();
-    private IList<string> models = new List<string>();
-    private static string selectedModel = "";
-
-    public IList<string> GetModels()
-    {
-        return Directory.GetFiles("/home/lucas/.llamacpp/scripts/");
-    }
+    private UnLoadModelService _unLoadModelService = new UnLoadModelService();
+    private LoadModelService _loadModelService = new LoadModelService();
+    private static string _selectedModel = string.Empty;
+    private static bool _isLoaded = false;
 
     public void LoadModel(string path)
     {
-        selectedModel = path;
-        ProcessRunner.Run("/bin/bash", path);
+        if (!_isLoaded)
+        {
+            _selectedModel = path;
+            _isLoaded = true;
+            ProcessRunner.Run("/bin/bash", path);
+        }
     }
 
     public void UnLoadModel()
     {
-        if (!string.IsNullOrEmpty(selectedModel))
-            unLoadModelService.UnLoad(selectedModel);
+        if (!string.IsNullOrEmpty(_selectedModel) && _isLoaded)
+            _unLoadModelService.UnLoad(_selectedModel);
+        _selectedModel = string.Empty;
+        _isLoaded = false;
     }
 
 }

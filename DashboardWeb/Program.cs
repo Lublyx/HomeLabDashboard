@@ -12,6 +12,11 @@ public class Program
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
+        builder.WebHost.ConfigureKestrel(option =>
+        {
+           option.ListenAnyIP(8000); 
+        });
+
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
