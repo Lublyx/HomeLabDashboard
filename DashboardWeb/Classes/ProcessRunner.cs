@@ -18,6 +18,7 @@ namespace DashboardWeb.Classes
                 Arguments = argmuments,
                 CreateNoWindow = true,
                 UseShellExecute = false,
+                UserName = "lucas"
             };
             Process.Start(processStartInfo);
         }

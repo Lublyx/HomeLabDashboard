@@ -1,3 +1,4 @@
+using DashboardWeb.Classes;
 using DashboardWeb.Components;
 
 namespace DashboardWeb;
@@ -12,10 +13,13 @@ public class Program
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
-        builder.WebHost.ConfigureKestrel(option =>
+        if (!builder.Environment.IsDevelopment())
         {
-           option.ListenAnyIP(8000); 
-        });
+            builder.WebHost.ConfigureKestrel(option =>
+                        {
+                            option.ListenAnyIP(80);
+                        });
+        }
 
         var app = builder.Build();
 
@@ -25,6 +29,10 @@ public class Program
             app.UseExceptionHandler("/Error");
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
+        }
+        else
+        {
+            Developpement.IsDevelopment = true;
         }
 
         app.UseHttpsRedirection();

@@ -14,7 +14,7 @@ namespace DashboardWeb.Services
         {
             string result = ProcessRunner.Run("/bin/bash", $"-c \"/bin/ps aux | /bin/grep \"{modelPath}\"\"", true);
 
-            Regex regex = new Regex(@"lucas\s{0,}(\d{0,})  ");
+            Regex regex = new Regex(@"\w{0,}\s{0,}(\d{0,})  ");
             MatchCollection matches = regex.Matches(result);
             string pid = matches.First().Groups[1].Value.Trim();
 
